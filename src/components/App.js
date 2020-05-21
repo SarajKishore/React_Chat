@@ -9,12 +9,17 @@ import Messages from './Messages/Messages';
 import MetaPanel from './MetaPanel/MetaPanel';
 
 
-const App =({currentUser, currentChannel, isPrivateChannel})=>(
-  <Grid columns="equal" className="app" style={{background: '#eee'}}>
-    <ColorPanel />
+const App =({currentUser, currentChannel, isPrivateChannel, userPosts, primaryColor, secondaryColor})=>(
+  <Grid columns="equal" className="app" style={{background: secondaryColor}}>
+    <ColorPanel 
+      key={currentUser && currentUser.name}
+      currentUser={currentUser}
+    />
     <SidePanel 
-    key={currentUser && currentUser.id}
-    currentUser={currentUser}/>
+      key={currentUser && currentUser.id}
+      currentUser={currentUser}
+      primaryColor={primaryColor}
+    />
     <Grid.Column style={{marginLeft: 320}}>
       <Messages
         key={currentChannel && currentChannel.id}   //when providing props to multiple components we need to provide a unique identifier a key
@@ -27,7 +32,8 @@ const App =({currentUser, currentChannel, isPrivateChannel})=>(
 
     <Grid.Column width={4}>
       <MetaPanel 
-      key={currentChannel && currentChannel.id} //so it renders properly
+      key={currentChannel && currentChannel.name} //so it renders properly
+      userPosts={userPosts}
       currentChannel={currentChannel}
       isPrivateChannel={isPrivateChannel}/>
     </Grid.Column>
@@ -37,7 +43,10 @@ const App =({currentUser, currentChannel, isPrivateChannel})=>(
 const mapStateToProps = state =>({
   currentUser: state.user.currentUser,     //taking current user value and passing it as props to SidePanel which again send this value to UserPanel as a prop
   currentChannel: state.channel.currentChannel,  //taking current user value and passing it as props to Messages which again send this value to MessageForm as a prop
-  isPrivateChannel: state.channel.isPrivateChannel
+  isPrivateChannel: state.channel.isPrivateChannel,
+  userPosts: state.channel.userPosts,
+  primaryColor: state.colors.primaryColor,
+  secondaryColor: state.colors.secondaryColor 
 })
 
 export default connect(mapStateToProps)(App);

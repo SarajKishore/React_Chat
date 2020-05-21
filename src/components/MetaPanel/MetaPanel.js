@@ -1,5 +1,5 @@
 import React from 'react';
-import {Segment, Accordion, Header, Icon, Image} from 'semantic-ui-react';
+import {Segment, Accordion, Header, Icon, Image, List} from 'semantic-ui-react';
 
 class MetaPanel extends React.Component{
     state={
@@ -17,8 +17,26 @@ class MetaPanel extends React.Component{
         })
     }
 
+    formatCount = num =>(num > 1 || num===0) ? `${num} posts` : `${num} post`;
+
+    displayTopPosters = posts =>(
+        Object.entries(posts) //converts key of objects and its value into array ex- {b: 1, c:2} to 0: ["b",1] 1: ["c",2]
+            .sort((a,b)=> b[1]-a[1])    //compares count values and arrange it in descending order
+            .map(([key,val],i)=>(
+                <List.Item key={i}>
+                    <Image avatar src={val.avatar}/>
+                    <List.Content>
+                        <List.Header as="a">{key}</List.Header>
+                        <List.Description>{this.formatCount(val.count)} posts</List.Description>
+                    </List.Content>
+                </List.Item>
+            ))
+            .slice(0,3) //To Limit no. of top posters
+    )
+
     render(){
         const {activeIndex, privateChannel,channel}= this.state;
+        const {userPosts}= this.props;
 
         if(privateChannel) return null; // So metachannel is not displayed when on a private channel
         //also used because it takes certain time for channel to come to state so for that time display nothing (using OR !channel)
@@ -52,7 +70,9 @@ class MetaPanel extends React.Component{
                             Top Posters 
                     </Accordion.Title>
                     <Accordion.Content active={activeIndex === 1}>
-                        Posters
+                        <List>
+                            {userPosts && this.displayTopPosters(userPosts)}
+                        </List>
                     </Accordion.Content>
 
                     <Accordion.Title
